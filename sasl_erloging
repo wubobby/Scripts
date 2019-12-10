@@ -1,0 +1,13 @@
+#!/bin/bash
+
+ABSPATH=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$ABSPATH")
+cd $SCRIPTPATH
+
+WEEK=$(date +"%u")
+#cat /var/log/mail.log |grep UGFzc3dvcmQ6 |cut -d [ -f 3| cut -d ] -f 1|uniq > $WEEK
+cat /var/log/mail.log* |grep UGFzc3dvcmQ6 |cut -d [ -f 3| cut -d ] -f 1 |sort | uniq -c | sort -nr -t 1 > $WEEK
+
+BANIP=$(cat $WEEK)
+
+
