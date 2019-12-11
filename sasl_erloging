@@ -4,10 +4,20 @@ ABSPATH=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$ABSPATH")
 cd $SCRIPTPATH
 
-WEEK=$(date +"%u")
+#WEEK=$(date +"%u")
 #cat /var/log/mail.log |grep UGFzc3dvcmQ6 |cut -d [ -f 3| cut -d ] -f 1|uniq > $WEEK
-cat /var/log/mail.log* |grep UGFzc3dvcmQ6 |cut -d [ -f 3| cut -d ] -f 1 |sort | uniq -c | sort -nr -t 1 > $WEEK
+firewall-cmd --reload
+rm -f saslerror.2
+mv saslerror.1 saslerror.2
+mv saslerror saslerror.1
 
-BANIP=$(cat $WEEK)
+cat /var/log/mail.log* |grep UGFzc3dvcmQ6 |cut -d [ -f 3| cut -d ] -f 1 |sort | uniq -c | sort -nr -t 1 > saslerror
 
+BANIP=$(cat saslerror*|awk '$1 >= 10 {print $2 }')
+#echo "$BANIP"
 
+for i in $BANIP
+do
+	echo "firewall-cmd --add-rich-rule='rule family="ipv4" source address={$i} drop'"
+	
+done
