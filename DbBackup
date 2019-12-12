@@ -1,0 +1,14 @@
+#!\bin\bash
+#!/bin/bash
+
+ABSPATH=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$ABSPATH")
+cd $SCRIPTPATH
+
+#vim /etc/.my.cnf
+#host =
+#port = 
+#user = 
+#password =
+mysqldump --defaults-file=/etc/.my.cnf --all-databases > Backup-$(date '+%Y%m%d').sql
+rm -f Backup-$(date --date='8 days ago' "+%Y%m%d").sql 
