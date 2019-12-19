@@ -6,18 +6,20 @@ cd $SCRIPTPATH
 
 #WEEK=$(date +"%u")
 #cat /var/log/mail.log |grep UGFzc3dvcmQ6 |cut -d [ -f 3| cut -d ] -f 1|uniq > $WEEK
-firewall-cmd --reload
-rm -f saslerror.2
-mv saslerror.1 saslerror.2
-mv saslerror saslerror.1
+iptables -F
 
-cat /var/log/mail.log* |grep UGFzc3dvcmQ6 |cut -d [ -f 3| cut -d ] -f 1 |sort | uniq -c | sort -nr -t 1 > saslerror
+rm -f saslerrorlog.2
+mv saslerrorlog.1 saslerrorlog.2
+mv saslerrorlog saslerrorlog.1
 
-BANIP=$(cat saslerror*|awk '$1 >= 10 {print $2 }')
+cat /var/log/mail.log* |grep UGFzc3dvcmQ6 |cut -d [ -f 3| cut -d ] -f 1 |sort | uniq -c | sort -nr -t 1 > saslerrorlog
+
+BANIP=$(cat saslerrorlog*|awk '$1 >= 50 {print $2 }')
 #echo "$BANIP"
 
 for i in $BANIP
 do
-	echo "firewall-cmd --add-rich-rule='rule family="ipv4" source address={$i} drop'"
-	
+         iptables -A INPUT -s $i/32 -j DROP
+
 done
+
